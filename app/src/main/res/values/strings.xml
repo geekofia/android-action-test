@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">Sanjaya Gavalgana</string>
+    <string name="start">Start</string>
+    <string name="stop">Stop</string>
+    <string name="app_arch">App Architecture</string>
+    <string name="app_arch_32_bit">32 Bit</string>
+    <string name="app_arch_64_bit">64 Bit</string>
+    <string name="exec_mode">Execution Mode</string>
+    <string name="exec_mode_root">Root</string>
+    <string name="exec_mode_non_root">Non Root</string>
+    <string name="clear_log">Clear Log</string>
+    <string name="reset_guest">Reset Guest BGMI Root</string>
 </resources>
