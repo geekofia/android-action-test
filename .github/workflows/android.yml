@@ -61,22 +61,22 @@ jobs:
       - name: Upload debug APK - ${{ env.repository_name }}
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - APK(s) debug generated
-          path: ${{ env.main_project_module }}/build/outputs/apk/debug/
+          name: app-debug.apk
+          path: ${{ env.main_project_module }}/build/outputs/apk/debug/app-debug.apk
 
       # noted for output [main_project_module]/build/outputs/apk/release/
       - name: Upload release APK - ${{ env.repository_name }}
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - APK(s) release generated
-          path: ${{ env.main_project_module }}/build/outputs/apk/release/
+          name: app-release.apk
+          path: ${{ env.main_project_module }}/build/outputs/apk/release/app-release.apk
 
       # noted for output [main_project_module]/build/outputs/bundle/release/
       - name: Upload release AAB - ${{ env.repository_name }}
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ env.date_today }} - ${{ env.playstore_name }} - ${{ env.repository_name }} - App bundle(s) AAB release generated
-          path: ${{ env.main_project_module }}/build/outputs/bundle/release/
+          name: app-release.aab
+          path: ${{ env.main_project_module }}/build/outputs/bundle/release/app-release.aab
 
   release:
     name: Release APK
@@ -88,7 +88,7 @@ jobs:
       - name: Download APK from build
         uses: actions/download-artifact@v3
         with:
-          name: build
+          name: app-release.apk
 
       - name: Create Release
         id: create_release
@@ -106,6 +106,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: apk/app-debug.apk
-          asset_name: MensaApp.apk
-          asset_content_type: application/zip
+          asset_path: build/app-release.apk
+          asset_name: ${{ env.date_today }}-${{ env.repository_name }}.apk
+          asset_content_type: application/octet-stream
