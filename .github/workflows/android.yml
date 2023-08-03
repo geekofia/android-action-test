@@ -61,21 +61,21 @@ jobs:
       - name: Upload debug APK - ${{ env.repository_name }}
         uses: actions/upload-artifact@v3
         with:
-          name: app-debug.apk
+          name: app-debug.apk # this name will be used to download artifects
           path: ${{ env.main_project_module }}/build/outputs/apk/debug/app-debug.apk
 
       # noted for output [main_project_module]/build/outputs/apk/release/
-      - name: Upload release APK - ${{ env.repository_name }}
-        uses: actions/upload-artifact@v3
-        with:
-          name: app-release.apk
-          path: ${{ env.main_project_module }}/build/outputs/apk/release/app-release.apk
+      # - name: Upload release APK - ${{ env.repository_name }}
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: app-release.apk # this name will be used to download artifects
+      #     path: ${{ env.main_project_module }}/build/outputs/apk/release/app-release.apk
 
       # noted for output [main_project_module]/build/outputs/bundle/release/
       - name: Upload release AAB - ${{ env.repository_name }}
         uses: actions/upload-artifact@v3
         with:
-          name: app-release.aab
+          name: app-release.aab # this name will be used to download artifects
           path: ${{ env.main_project_module }}/build/outputs/bundle/release/app-release.aab
 
   release:
@@ -88,7 +88,7 @@ jobs:
       - name: Download APK from build
         uses: actions/download-artifact@v3
         with:
-          name: app-release.apk
+          name: app-debug.apk # this name will be used to download artifects
 
       - name: Create Release
         id: create_release
@@ -105,7 +105,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
         with:
+          # where to upload
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: build/app-release.apk
-          asset_name: ${{ env.date_today }}-${{ env.repository_name }}.apk
+          # grab file from this path
+          asset_path: build/app-debug.apk
+          # rename the file in release
+          asset_name: ${{ env.date_today }}-${{ env.repository_name }}.apk 
+          # https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
           asset_content_type: application/octet-stream
