@@ -86,16 +86,18 @@ jobs:
 
     steps:
       - name: Download APK from build
+        id: download_artifacts
+        # https://github.com/actions/download-artifact
         uses: actions/download-artifact@v3 # download all artifects
 
       - name: Update Release
         id: update_release
+        # https://github.com/ncipollo/release-action
         uses: ncipollo/release-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
         with:
-          # https://github.com/ncipollo/release-action
-          artifacts: "*.apk,*.aab"
+          artifacts: ${{steps.download_artifacts.outputs.download-path}}/*
           removeArtifacts: true
           name: Release ${{ github.ref_name }}
           generateReleaseNotes: true
