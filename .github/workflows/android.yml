@@ -65,20 +65,20 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ env.main_project_module }}-debug-apk
-          path: ${{ env.main_project_module }}/build/outputs/apk/debug/app-debug.apk
+          path: ${{ env.main_project_module }}/build/outputs/apk/debug/${{ env.main_project_module }}-debug.apk
 
       # noted for output [main_project_module]/build/outputs/apk/release/
       - name: Upload release APK - ${{ env.repository_name }}
         uses: actions/upload-artifact@v3
         with:
           name: ${{ env.main_project_module }}-release-unsigned-apk
-          path: ${{ env.main_project_module }}/build/outputs/apk/release/
+          path: ${{ env.main_project_module }}/build/outputs/apk/release/${{ env.main_project_module }}-release-unsigned.apk
 
       # noted for output [main_project_module]/build/outputs/bundle/release/
       - name: Upload release AAB - ${{ env.repository_name }}
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ env.date_today }} - ${{ env.repository_name }} - App bundle(s) AAB release generated
+          name: ${{ env.main_project_module }}-release-aab
           path: ${{ env.main_project_module }}/build/outputs/bundle/release/
 
   release:
@@ -92,6 +92,8 @@ jobs:
         id: download_artifacts
         # https://github.com/actions/download-artifact
         uses: actions/download-artifact@v3 # download all artifects
+        with:
+          name: "${{ env.main_project_module }}-debug-apk,${{ env.main_project_module }}-release-unsigned-apk,${{ env.main_project_module }}-release-aab"
 
       - name: Display structure of downloaded files
         run: ls -R ${{steps.download.outputs.download-path}}
@@ -103,7 +105,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
         with:
-          artifacts: "${{steps.download.outputs.download-path}}/*.apk,${{steps.download.outputs.download-path}}/*.aab"
+          artifacts: "${{ env.main_project_module }}-debug.apk,${{ env.main_project_module }}-release-unsigned.apk,${{ env.main_project_module }}-release.aab"
           removeArtifacts: true
           name: Release ${{ github.ref_name }}
           generateReleaseNotes: true
