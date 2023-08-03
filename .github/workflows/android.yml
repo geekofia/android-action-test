@@ -48,12 +48,15 @@ jobs:
       - name: Build gradle project
         run: ./gradlew build
 
+      # create debug APK
       - name: Create debug APK - ${{ env.main_project_module }} module
         run: ./gradlew assembleDebug
 
+      # create release APK
       - name: Create release APK - ${{ env.main_project_module }} module
         run: ./gradlew assemble
 
+      # create release AAB
       - name: Create release AAB - ${{ env.main_project_module }} module
         run: ./gradlew ${{ env.main_project_module }}:bundleRelease
 
@@ -64,19 +67,19 @@ jobs:
           name: ${{ env.main_project_module }}-debug-apk
           path: ${{ env.main_project_module }}/build/outputs/apk/debug/app-debug.apk
 
-      # noted for output [main_project_module]/build/outputs/bundle/debug/
-      - name: Upload debug AAB - ${{ env.repository_name }}
+      # noted for output [main_project_module]/build/outputs/apk/release/
+      - name: Upload release APK - ${{ env.repository_name }}
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ env.main_project_module }}-debug-aab
-          path: ${{ env.main_project_module }}/build/outputs/bundle/debug/app-debug.aab
+          name: ${{ env.main_project_module }}-release-unsigned-apk
+          path: ${{ env.main_project_module }}/build/outputs/apk/release/
 
-      # noted for output [main_project_module]/release/
-      # - name: Upload release APK - ${{ env.repository_name }}
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     name: app-release.apk # this name will be used to download artifects
-      #     path: ${{ env.main_project_module }}/release/
+      # noted for output [main_project_module]/build/outputs/bundle/release/
+      - name: Upload release AAB - ${{ env.repository_name }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.date_today }} - ${{ env.repository_name }} - App bundle(s) AAB release generated
+          path: ${{ env.main_project_module }}/build/outputs/bundle/release/
 
   release:
     name: Release APK
@@ -91,7 +94,7 @@ jobs:
         uses: actions/download-artifact@v3 # download all artifects
 
       - name: Display structure of downloaded files
-        run: ls -R
+        run: ls -R ${{steps.download.outputs.download-path}}
 
       - name: Update Release
         id: update_release
@@ -100,7 +103,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
         with:
-          artifacts: ${{steps.download_artifacts.outputs.download-path}}/*.apk
+          artifacts: "${{steps.download.outputs.download-path}}/*.apk,${{steps.download.outputs.download-path}}/*.aab"
           removeArtifacts: true
           name: Release ${{ github.ref_name }}
           generateReleaseNotes: true
