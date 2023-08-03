@@ -98,21 +98,6 @@ jobs:
         with:
           artifacts: app-debug.apk
           removeArtifacts: true
-          name: Release ${{ github.ref }}
+          name: Release ${{ github.ref_name }}
           generateReleaseNotes: true
           allowUpdates: true
-
-      - name: Upload Release APK
-        id: upload_release_asset
-        uses: actions/upload-release-asset@v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
-        with:
-          # where to upload
-          upload_url: ${{ steps.update_release.outputs.upload_url }}
-          # grab file from this path
-          asset_path: build/app-debug.apk
-          # rename the file in release
-          asset_name: ${{ env.date_today }}-${{ env.repository_name }}.apk
-          # https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
-          asset_content_type: application/octet-stream
