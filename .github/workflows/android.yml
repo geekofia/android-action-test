@@ -86,9 +86,7 @@ jobs:
 
     steps:
       - name: Download APK from build
-        uses: actions/download-artifact@v3
-        with:
-          name: app-debug.apk # this name will be used to download artifects
+        uses: actions/download-artifact@v3 # download all artifects
 
       - name: Update Release
         id: update_release
@@ -96,7 +94,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
         with:
-          artifacts: app-debug.apk
+          # https://github.com/ncipollo/release-action
+          artifacts: "*.apk,*.aab"
           removeArtifacts: true
           name: Release ${{ github.ref_name }}
           generateReleaseNotes: true
