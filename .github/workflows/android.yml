@@ -8,7 +8,7 @@ on:
   push:
     branches: ["main"]
     tags:
-      - "v*"
+      - "*"
 
   pull_request:
     branches: ["main"]
@@ -64,12 +64,12 @@ jobs:
           name: app-debug.apk # this name will be used to download artifects
           path: ${{ env.main_project_module }}/build/outputs/apk/debug/app-debug.apk
 
-      # noted for output [main_project_module]/build/outputs/apk/release/
+      # noted for output [main_project_module]/release/
       # - name: Upload release APK - ${{ env.repository_name }}
       #   uses: actions/upload-artifact@v3
       #   with:
       #     name: app-release.apk # this name will be used to download artifects
-      #     path: ${{ env.main_project_module }}/build/outputs/apk/release/app-release.apk
+      #     path: ${{ env.main_project_module }}/release/app-release.apk
 
       # noted for output [main_project_module]/build/outputs/bundle/release/
       - name: Upload release AAB - ${{ env.repository_name }}
@@ -81,7 +81,7 @@ jobs:
   release:
     name: Release APK
     needs: build
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
 
     steps:
@@ -90,14 +90,17 @@ jobs:
         with:
           name: app-debug.apk # this name will be used to download artifects
 
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1.1.4
+      - name: Update Release
+        id: update_release
+        uses: ncipollo/release-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          artifacts: app-debug.apk
+          removeArtifacts: true
+          name: Release ${{ github.ref }}
+          generateReleaseNotes: true
+          allowUpdates: true
 
       - name: Upload Release APK
         id: upload_release_asset
@@ -106,10 +109,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
         with:
           # where to upload
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          upload_url: ${{ steps.update_release.outputs.upload_url }}
           # grab file from this path
           asset_path: build/app-debug.apk
           # rename the file in release
-          asset_name: ${{ env.date_today }}-${{ env.repository_name }}.apk 
+          asset_name: ${{ env.date_today }}-${{ env.repository_name }}.apk
           # https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
           asset_content_type: application/octet-stream
